@@ -2,6 +2,7 @@ package org.example.service;
 
 import lombok.Data;
 import org.example.model.Elevator;
+import org.example.model.UserRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +29,12 @@ public class ElevatorManager {
     public boolean moveUp(Elevator elevator) {
         if (elevator.getCurrentFloor() + 1 <= elevator.getFloorsLimit().get(1)) {
             elevator.setCurrentFloor(elevator.getCurrentFloor() + 1);
-            if (elevator.isMovingDown()) {
-                elevator.setMovingDown(false);
+            if(elevator.getFloorsQueue().size() == 0){
+
             }
-            elevator.setMovingDown(true);
+            else if(elevator.getCurrentFloor() == elevator.getFloorsQueue().get(0)){
+                elevator.getFloorsQueue().remove(0);
+            }
             return true;
         }
         return false;
@@ -40,13 +43,67 @@ public class ElevatorManager {
     public boolean moveDown(Elevator elevator) {
         if (elevator.getCurrentFloor() - 1 >= elevator.getFloorsLimit().get(0)) {
             elevator.setCurrentFloor(elevator.getCurrentFloor() - 1);
-            if (elevator.isMovingUp()) {
-                elevator.setMovingUp(false);
+            if(elevator.getFloorsQueue().size() == 0){
+
             }
-            elevator.setMovingDown(true);
+            else if(elevator.getCurrentFloor() == elevator.getFloorsQueue().get(0)){
+                elevator.getFloorsQueue().remove(0);
+            }
             return true;
         }
         return false;
+    }
+
+    public void elevatorMove(Elevator elevator) {
+        int currentFloor = elevator.getCurrentFloor();
+        List<Integer> floorsQueue = elevator.getFloorsQueue();
+
+        if (!floorsQueue.isEmpty()) {
+            int nextFloor = floorsQueue.get(0);
+
+            if (nextFloor > currentFloor) {
+                moveUp(elevator);
+            } else if (nextFloor < currentFloor) {
+                moveDown(elevator);
+            }
+        }
+    }
+    public void processRequestOutside(Elevator elevator, UserRequest userRequest){
+        addFloors(elevator, userRequest.getStaringFloor(), userRequest.getRequestValue());
+    }
+
+    public void processRequestInside(Elevator elevator, int destinationFloor){
+        int requestValue = 1;
+        int passengerElevatorDirection = destinationFloor - elevator.getCurrentFloor();
+        if(passengerElevatorDirection == 1){
+            addFloors(elevator, destinationFloor, 1);
+        }
+        else if(passengerElevatorDirection == -1){
+            addFloors(elevator, destinationFloor, -1);
+        }
+        else {
+            addFloors(elevator, destinationFloor, 0);
+        }
+    }
+
+
+
+    public int findOptimal(List<Elevator> elevators){
+        if(elevators.size() == 0){
+            return -1;
+        }
+
+        int minPath = Integer.MAX_VALUE;
+        int id = -1;
+        //looking for min
+        for (int i = 0; i < elevators.size(); i++) {
+            int path = calculatePath(elevators.get(i));
+            if (path < minPath) {
+                minPath = path;
+                id = i;
+            }
+        }
+        return id;
     }
 
     //request value -> user direction
@@ -56,6 +113,9 @@ public class ElevatorManager {
             return false;
         } else if (!(requestValue == 1 || requestValue == -1)) {
             return false;
+        } else if(elevator.getFloorsQueue().size() == 0){
+            elevator.getFloorsQueue().add(staringFloor);
+            return true;
         }
 
         int elevatorDirecton = elevatorDirection(elevator);
@@ -77,8 +137,15 @@ public class ElevatorManager {
                     }
                 }
                 int id = elevator.getFloorsQueue().indexOf(flag);
-                id = id == 0 ? id : elevator.getFloorsQueue().indexOf(flag) + 1;
-                elevator.getFloorsQueue().add(id, staringFloor);
+                if(id == -1){
+                    elevator.getFloorsQueue().add(staringFloor);
+                }
+                else if(elevator.getFloorsQueue().get(id) < staringFloor){
+                    elevator.getFloorsQueue().add(id + 1, staringFloor);
+                }
+                else{
+                    elevator.getFloorsQueue().add(id, staringFloor);
+                }
                 return true;
             }
         }
@@ -89,7 +156,10 @@ public class ElevatorManager {
             if(elevator.getFloorsQueue().contains(staringFloor) && reversingIndex != -1 && elevator.getFloorsQueue().lastIndexOf(staringFloor) >= reversingIndex){
                 return true;
             }
-            else if(reversingIndex == -1){
+            if(elevator.getFloorsQueue().contains(staringFloor) && reversingIndex == -1 && elevator.getFloorsQueue().lastIndexOf(staringFloor) == elevator.getFloorsQueue().size() - 1){
+                return true;
+            }
+            else if(reversingIndex == -1 ){
                 elevator.getFloorsQueue().add(staringFloor);
                 return true;
             }
@@ -102,26 +172,103 @@ public class ElevatorManager {
                     }
                 }
                 int id = elevator.getFloorsQueue().lastIndexOf(flag);
-                elevator.getFloorsQueue().add(id, staringFloor);
+                if(id == -1){
+                    elevator.getFloorsQueue().add(staringFloor);
+                }
+                else if(elevator.getFloorsQueue().get(id) > staringFloor){
+                    elevator.getFloorsQueue().add(id + 1, staringFloor);
+                }
+                else{
+                    elevator.getFloorsQueue().add(id, staringFloor);
+                }
                 return true;
             }
-
         }
-
-
-
-
-
-
-
-
+        //if elevator goes down and user want to go down as well
+        else if (elevatorDirecton == -1 && requestValue == -1) {
+            System.out.println("-1 -1");
+            //if elevator is under staringFloor
+            //check if staringFloor is already in list
+            if(elevator.getFloorsQueue().contains(staringFloor)){
+                return true;
+            }
+            //check if staringFloor is already in list
+            else if(!elevator.getFloorsQueue().contains(staringFloor)){
+                int flag = elevator.getCurrentFloor();
+                for (Integer i : elevator.getFloorsQueue()) {
+                    if(i < flag && flag > staringFloor){
+                        flag = i;
+                    }
+                }
+                int id = elevator.getFloorsQueue().indexOf(flag);
+                if(id == -1){
+                    elevator.getFloorsQueue().add(staringFloor);
+                }
+                else if(elevator.getFloorsQueue().get(id) > staringFloor){
+                    elevator.getFloorsQueue().add(id + 1, staringFloor);
+                }
+                else{
+                    elevator.getFloorsQueue().add(id, staringFloor);
+                }
+                return true;
+            }
+        }
+        //if elevator goes down and user want to go up
+        else if (elevatorDirecton == -1 && requestValue == 1) {
+            System.out.println("-1 1");
+            int reversingIndex = findFirstReversingIndex(elevator.getFloorsQueue());
+            if(elevator.getFloorsQueue().contains(staringFloor) && reversingIndex != -1 && elevator.getFloorsQueue().lastIndexOf(staringFloor) >= reversingIndex){
+                return true;
+            }
+            else if(elevator.getFloorsQueue().contains(staringFloor) && reversingIndex == -1 && elevator.getFloorsQueue().lastIndexOf(staringFloor) == elevator.getFloorsQueue().size() - 1){
+                return true;
+            }
+            else if(reversingIndex == -1){
+                elevator.getFloorsQueue().add(staringFloor);
+                return true;
+            }
+            else if(reversingIndex != -1){
+                int flag = elevator.getFloorsQueue().get(reversingIndex);
+                for(int i = reversingIndex; i < elevator.getFloorsQueue().size(); i++){
+                    int val = elevator.getFloorsQueue().get(i);
+                    if(val > flag && flag < staringFloor){
+                        flag = elevator.getFloorsQueue().get(i);
+                    }
+                }
+                int id = elevator.getFloorsQueue().lastIndexOf(flag);
+                if(id == -1){
+                    elevator.getFloorsQueue().add(staringFloor);
+                }
+                else if(elevator.getFloorsQueue().get(id) < staringFloor){
+                    elevator.getFloorsQueue().add(id + 1, staringFloor);
+                }
+                else{
+                    elevator.getFloorsQueue().add(id, staringFloor);
+                }
+                return true;
+            }
+        }
             //not moving
+            System.out.println("0 0");
             return false;
     }
 
-    //!!!??
+    public int calculatePath(Elevator elevator) {
+        int path = 0;
+        int current = elevator.getCurrentFloor();
+        List<Integer> list = elevator.getFloorsQueue();
+
+        for (int i = 0; i < list.size(); i++) {
+            int nextFloor = list.get(i);
+            path += Math.abs(nextFloor - current);
+            //System.out.println(Math.abs(nextFloor - current));
+            current = nextFloor;
+        }
+        return path;
+    }
+
     public int elevatorDirection(Elevator elevator){
-        int next = elevator.getFloorsQueue().get(0);//!!!??
+        int next = elevator.getFloorsQueue().get(0);//!!
         int current = elevator.getCurrentFloor();
         if(next - current > 0){
             //up

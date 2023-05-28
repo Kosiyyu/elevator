@@ -16,16 +16,9 @@ public class Elevator {
     private int currentFloor;
     //------------------------------------------------
 
-    //state-------------------------------------------
-    private boolean movingUp;
-    private boolean movingDown;
-    //------------------------------------------------
-
     public Elevator(){
         this.floorsQueue = new LinkedList<>();
         this.currentFloor = 0;//watch out for limits
-        this.movingUp = false;
-        this.movingDown = false;
     }
 
     @Override
@@ -34,8 +27,6 @@ public class Elevator {
                 "floorsLimit=" + floorsLimit +
                 ", floorsQueue=" + floorsQueue +
                 ", currentFloor=" + currentFloor +
-                ", movingUp=" + movingUp +
-                ", movingDown=" + movingDown +
                 '}';
     }
 }
