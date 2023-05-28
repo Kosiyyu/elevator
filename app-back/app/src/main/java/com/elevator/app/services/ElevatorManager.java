@@ -13,7 +13,7 @@ import java.util.List;
 public class ElevatorManager {
 
     //content------------------------
-    private final List<Elevator> elevators;
+    private List<Elevator> elevators;
     //-------------------------------
 
     public ElevatorManager() {
@@ -66,10 +66,32 @@ public class ElevatorManager {
             if (nextFloor > currentFloor) {
                 moveUp(elevator);
             } else if (nextFloor < currentFloor) {
-                moveDown(elevator);
+                if (moveDown(elevator)) {
+                    floorsQueue.remove(0);
+                    return;
+                }
+            } else {
+                floorsQueue.remove(0);
+                return;
             }
+
+            if (floorsQueue.size() == 1) {
+                int lastFloor = floorsQueue.get(0);
+                if (currentFloor == lastFloor - 1) {
+                    return;
+                }
+            }
+
+            currentFloor = elevator.getCurrentFloor();
+        } else {
         }
+
+        elevator.setCurrentFloor(currentFloor);
     }
+
+
+
+
     public void processRequestOutside(Elevator elevator, UserRequest userRequest){
         addFloors(elevator, userRequest.getStaringFloor(), userRequest.getRequestValue());
     }
