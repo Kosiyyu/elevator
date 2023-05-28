@@ -1,19 +1,37 @@
 # Elevator
 
-# Wymagania
+>Karol Koś
+
+#
+
+## Wymagania
 ```
 git
-java 19.0.2
-nodejs
+java 19.0.2 and +19.0.2
+nodejs 14 and +14
 ```
-# Instalacja i uruchomienie:
+## Pobranie i uruchomienie:
+
+Pobranie:
 ```
 git clone https://github.com/Kosiyyu/elevator.git
-cd elevator
+```
+
+Uruchomienie backendu:
+```
+cd elevator/app-back/app
+./mvnw spring-boot:run
+```
+
+Uruchomienie frontendu:
+```
+cd elevator/app-front/app
+npm install
+npm start
 ```
 
 
-# Opis projektu
+## Opis projektu
 Backend został napisany w Spring-Boocie, a frontend w Reacie
 
 ## Opis algorytmu
