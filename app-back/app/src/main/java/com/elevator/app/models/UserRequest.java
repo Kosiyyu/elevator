@@ -1,4 +1,11 @@
 package com.elevator.app.models;
 
-public class UserReqeust {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class UserRequest {
+    private int requestValue;
+    private int staringFloor;
 }

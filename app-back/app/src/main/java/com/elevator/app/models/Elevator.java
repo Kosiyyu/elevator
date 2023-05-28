@@ -1,46 +1,44 @@
 package com.elevator.app.models;
 
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
-@Entity
 @Data
+@Entity
 public class Elevator {
-    @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
-    private Integer id;
 
-    private Integer currentFloor;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+    //limits------------------------------------------
 
     @ElementCollection
-    private List<Integer> targetFloors;
+    private final List<Integer> floorsLimit = List.of(0, 6);
+    //------------------------------------------------
 
-    private Boolean isRunning;
+    //floors------------------------------------------
+    @ElementCollection
+    private List<Integer> floorsQueue;
+    private int currentFloor;
+    //------------------------------------------------
 
-    private Integer minFloor;
-
-    private Integer maxFloor;
-
-
-    public Elevator() {}
-
-    public Elevator(Integer id) {
-        this.id = id;
-        this.currentFloor = 0;
-        this.targetFloors = new ArrayList<>();
-        this.isRunning = true;
+    public Elevator(){
+        this.floorsQueue = new LinkedList<>();
+        this.currentFloor = 0;//watch out for limits
     }
 
-    public Elevator(Integer id, Integer currentFloor, List<Integer> targetFloors, boolean isRunning) {
-        this.id = id;
-        this.currentFloor = currentFloor;
-        this.targetFloors = targetFloors;
-        this.isRunning = isRunning;
+
+
+    @Override
+    public String toString() {
+        return "Elevator{" +
+                "floorsLimit=" + floorsLimit +
+                ", floorsQueue=" + floorsQueue +
+                ", currentFloor=" + currentFloor +
+                '}';
     }
 }

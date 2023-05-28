@@ -15,35 +15,22 @@ public class ElevatorService {
     }
 
     public void addElevator(Elevator elevator) {
-        //elevator.getTargetFloors().sort(Integer::compareTo);
         elevatorRepository.save(elevator);
     }
 
     public void patchElevator(Elevator elevator) {
-        Elevator existingElevator  = elevatorRepository.findById(elevator.getId()).orElse(null);
-        if(existingElevator == null){
+        Elevator existingElevator = elevatorRepository.findById(elevator.getId()).orElse(null);
+        if (existingElevator == null) {
             throw new IllegalArgumentException("Elevator does not exist");
-        }
-        else
-        {
-            if(elevator.getMinFloor() != null){
-                existingElevator.setMinFloor(elevator.getMinFloor());
+        } else {
+            if (elevator.getFloorsQueue() != null && !elevator.getFloorsQueue().isEmpty()) {
+                existingElevator.setFloorsQueue(elevator.getFloorsQueue());
             }
-            if(elevator.getMaxFloor() != null){
-                existingElevator.setMaxFloor(elevator.getMaxFloor());
-            }
-            if(elevator.getCurrentFloor() != null){
-                existingElevator.setCurrentFloor(elevator.getCurrentFloor());
-            }
-            if(elevator.getIsRunning() != null){
-                existingElevator.setIsRunning(elevator.getIsRunning());
-            }
-            if(elevator.getTargetFloors() != null){
-                existingElevator.setTargetFloors(elevator.getTargetFloors());
-            }
+            existingElevator.setCurrentFloor(elevator.getCurrentFloor());
             elevatorRepository.save(existingElevator);
         }
     }
+
 
     public void removeElevator(int id) {
         elevatorRepository.deleteById(id);

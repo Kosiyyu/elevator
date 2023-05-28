@@ -31,8 +31,8 @@ public class ElevatorController {
         return ResponseEntity.status(200).body(list);
     }
 
-    @GetMapping("/single")
-    public ResponseEntity<Elevator> get(@RequestBody Map<String, Integer> requestBody){
+    @GetMapping("one")
+    public ResponseEntity get(@RequestBody Map<String, Integer> requestBody){
         Integer id = requestBody.get("id");
         Elevator elevator;
         try{
