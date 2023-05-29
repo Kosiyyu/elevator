@@ -11,7 +11,12 @@ const ElevatorTables = () => {
       const emptyData = {};
       const data = await addElevator(emptyData);
       console.log("addElevator response:", data);
-      setElevators(data);
+      
+      if (data !== undefined) {
+        setElevators(data);
+      } else {
+        console.error("Invalid response from addElevator:", data);
+      }
     } catch (error) {
       console.error("Error in handleAddElevator:", error);
     }
@@ -21,13 +26,17 @@ const ElevatorTables = () => {
     try {
       const data = await addUserRequest(requestData);
       console.log("addUserRequest response:", data);
-      setElevators(data);
+      
+      if (data !== undefined) {
+        setElevators(data);
+      } else {
+        console.error("Invalid response from addUserRequest:", data);
+      }
     } catch (error) {
       console.error("Error in handleAddUserRequest:", error);
     }
   };
   
-
   const iterRound = async () => {
     try {
       const emptyData = {};
@@ -39,9 +48,10 @@ const ElevatorTables = () => {
         console.error("Invalid response from runRound:", data);
       }
     } catch (error) {
-      console.error("Errori in iterRound:", error);
+      console.error("Error in iterRound:", error);
     }
   };
+  
   
   const foRound = async () => {
     try {
@@ -101,8 +111,6 @@ const ElevatorTables = () => {
     <div>
       <div className="d-flex justify-content-center">
         {elevators
-          .slice()
-          .reverse()
           .map((elevator) => (
             <div key={elevator.id} className="mx-2">
               {renderTable(elevator)}
