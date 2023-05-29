@@ -1,37 +1,66 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ElevatorPanel from './ElevatorPanel';
-import { addElevator, addUserRequest, runRound } from './api';
+import { addElevator, addUserRequest, runRound, runReset } from './api';
 
 const ElevatorTables = () => {
   const [elevators, setElevators] = useState([]);
 
   const handleAddElevator = async () => {
-    const emptyData = {};
-    const data = await addElevator(emptyData);
-    setElevators(data);
+    try {
+      const emptyData = {};
+      const data = await addElevator(emptyData);
+      console.log("addElevator response:", data);
+      setElevators(data);
+    } catch (error) {
+      console.error("Error in handleAddElevator:", error);
+    }
   };
-
+  
   const handleAddUserRequest = async (requestData) => {
-    const data = await addUserRequest(requestData);
-    setElevators(data);
+    try {
+      const data = await addUserRequest(requestData);
+      console.log("addUserRequest response:", data);
+      setElevators(data);
+    } catch (error) {
+      console.error("Error in handleAddUserRequest:", error);
+    }
   };
+  
 
   const iterRound = async () => {
-    const emptyData = {};
-    const data = await runRound(emptyData);
-    setElevators(data);
+    try {
+      const emptyData = {};
+      const data = await runRound(emptyData);
+  
+      if (Array.isArray(data)) {
+        setElevators(data);
+      } else {
+        console.error("Invalid response from runRound:", data);
+      }
+    } catch (error) {
+      console.error("Errori in iterRound:", error);
+    }
+  };
+  
+  const foRound = async () => {
+    try {
+      await iterRound();
+    } catch (error) {
+      console.error("Error in foRound:", error);
+    }
   };
 
-  const foLoader = () => {
-    iterRound();
+  const foReset = () => {
+    runReset()
+    setElevators([]);
   };
-
+  
   const renderTable = (elevator) => {
     const { id, floorsLimit, currentFloor, floorsQueue } = elevator;
     const floorBoxes = [];
-
-    for (let i = 0; i <= floorsLimit[1]; i++) {
+  
+    for (let i = floorsLimit[1]; i >= 0; i--) { // Reverse the loop order
       floorBoxes.push(
         <tr key={i}>
           <td
@@ -71,16 +100,24 @@ const ElevatorTables = () => {
   return (
     <div>
       <div className="d-flex justify-content-center">
-        {elevators.map((elevator) => (
-          <div key={elevator.id} className="mx-2">
-            {renderTable(elevator)}
-          </div>
-        ))}
+        {elevators
+          .slice()
+          .reverse()
+          .map((elevator) => (
+            <div key={elevator.id} className="mx-2">
+              {renderTable(elevator)}
+            </div>
+          ))}
       </div>
       <ElevatorPanel addElevator={handleAddElevator} onAddUserRequest={handleAddUserRequest} />
       <br />
-      <button className="btn btn-primary" onClick={foLoader}>
+      <button className="btn btn-primary" onClick={foRound}>
         Run Round
+      </button>
+      <br></br>
+      <br></br>
+      <button className="btn btn-danger" onClick={foReset}>
+        Reset
       </button>
     </div>
   );

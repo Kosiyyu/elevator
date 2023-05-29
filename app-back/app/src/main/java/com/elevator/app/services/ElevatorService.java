@@ -2,6 +2,7 @@ package com.elevator.app.services;
 
 import com.elevator.app.models.Elevator;
 import com.elevator.app.repositories.ElevatorRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 @Service
 public class ElevatorService {
     private final ElevatorRepository elevatorRepository;
+
 
     public ElevatorService(ElevatorRepository elevatorRepository) {
         this.elevatorRepository = elevatorRepository;
@@ -42,6 +44,10 @@ public class ElevatorService {
 
     public List<Elevator> getAllElevators() {
         return elevatorRepository.findAll();
+    }
+
+    public void removeAll(){
+        elevatorRepository.deleteAll();
     }
 
 }

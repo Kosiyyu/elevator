@@ -39,3 +39,16 @@ export const runRound = (data) => {
         console.log(error)
     });
 }
+
+export const runReset = (data) => {
+    return axios.post(`${API_BASE_URL + '/run/reset'}`, data, {
+        headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json;charset=UTF-8"
+        }
+    })        
+    .then(response => response.data)
+    .catch(error => {
+        console.log(error)
+    });
+}

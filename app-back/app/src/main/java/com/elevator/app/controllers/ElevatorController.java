@@ -109,6 +109,17 @@ public class ElevatorController {
         return ResponseEntity.status(200).body(elevatorService.getAllElevators());
     }
 
+    @PostMapping ("/run/reset")
+    public ResponseEntity runReset(){
+        try{
+            elevatorService.removeAll();
+        }
+        catch (Exception e){
+            return ResponseEntity.status(400).body(elevatorService.getAllElevators());
+        }
+        return ResponseEntity.status(200).body(elevatorService.getAllElevators());
+    }
+
 
     @DeleteMapping("/delete")
     public ResponseEntity delete(@RequestBody Map<String, Integer> requestBody){
