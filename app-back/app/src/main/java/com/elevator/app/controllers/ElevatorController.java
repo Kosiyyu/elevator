@@ -77,6 +77,7 @@ public class ElevatorController {
                 throw new Exception();
             }
             int id = elevatorManager.findOptimal(elevatorManager.getElevators());
+            System.out.println("id: " + id);
             if(id != -1){
                 Elevator elevator = elevatorManager.getElevators().get(id);
                 elevatorManager.processRequestOutside(elevator, userRequest);

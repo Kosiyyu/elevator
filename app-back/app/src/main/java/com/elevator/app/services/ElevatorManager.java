@@ -66,28 +66,19 @@ public class ElevatorManager {
             if (nextFloor > currentFloor) {
                 moveUp(elevator);
             } else if (nextFloor < currentFloor) {
-                if (moveDown(elevator)) {
-                    floorsQueue.remove(0);
-                    return;
-                }
+                moveDown(elevator);
             } else {
                 floorsQueue.remove(0);
-                return;
-            }
-
-            if (floorsQueue.size() == 1) {
-                int lastFloor = floorsQueue.get(0);
-                if (currentFloor == lastFloor - 1) {
-                    return;
-                }
             }
 
             currentFloor = elevator.getCurrentFloor();
-        } else {
+            if (floorsQueue.isEmpty() || currentFloor == nextFloor - 1) {
+                return;
+            }
         }
-
-        elevator.setCurrentFloor(currentFloor);
     }
+
+
 
 
 
@@ -112,18 +103,19 @@ public class ElevatorManager {
 
 
 
-    public int findOptimal(List<Elevator> elevators){
-        if(elevators.size() == 0){
+    public int findOptimal(List<Elevator> elevators) {
+        if (elevators.size() == 0) {
             return -1;
         }
-
         int minPath = Integer.MAX_VALUE;
         int id = -1;
-        //looking for min
+        // looking for min
         for (int i = 0; i < elevators.size(); i++) {
             int path = calculatePath(elevators.get(i));
             if (path < minPath) {
                 minPath = path;
+                id = i;
+            } else if (path == minPath && i < id) {
                 id = i;
             }
         }
